@@ -82,7 +82,12 @@ class _NewExpenseState extends State<NewExpense> {
   @override
   Widget build(BuildContext conetxt) {
     return Padding(
-      padding: const EdgeInsets.fromLTRB(16, 48, 16, 16,),
+      padding: const EdgeInsets.fromLTRB(
+        16,
+        48,
+        16,
+        16,
+      ),
       child: Column(
         children: [
           TextField(
@@ -151,17 +156,25 @@ class _NewExpenseState extends State<NewExpense> {
                   });
                 },
               ),
-              TextButton(
-                onPressed: () {
-                  Navigator.pop(context);
-                },
-                child: const Text('Cancel'),
+              Expanded(
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    TextButton(
+                      onPressed: () {
+                        Navigator.pop(context);
+                      },
+                      child: const Text('Cancel'),
+                    ),
+                    ElevatedButton(
+                      onPressed: _submitExpenseData,
+                      child: const Text(
+                        'Save Expense',
+                      ),
+                    ),
+                  ],
+                ),
               ),
-              ElevatedButton(
-                  onPressed: _submitExpenseData,
-                  child: const Text(
-                    'Save Expense',
-                  ))
             ],
           ),
         ],
