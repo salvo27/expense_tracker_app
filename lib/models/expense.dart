@@ -6,22 +6,23 @@ const uuid = Uuid();
 
 final formatter = DateFormat('dd/MM/yyyy');
 
-enum Category { food, travel, leisure, work }
+enum Category { cibo, viaggi, shopping, lavoro }
 
 const categoryIcons = {
-  Category.food: Icons.lunch_dining,
-  Category.travel: Icons.flight_takeoff,
-  Category.leisure: Icons.movie,
-  Category.work: Icons.work,
+  Category.cibo: Icons.lunch_dining,
+  Category.viaggi: Icons.flight_takeoff,
+  Category.shopping: Icons.movie,
+  Category.lavoro: Icons.work,
 };
 
 class Expense {
   Expense({
+    String? id,
     required this.title,
     required this.amount,
     required this.date,
     required this.category,
-  }) : id = uuid.v4(); //con questo 'costrutto' genereiamo un id e lo assegniamo
+  }) : id = id ?? uuid.v4(); //con questo 'costrutto' genereiamo un id e lo assegniamo
 
   final String id;
   final String title;

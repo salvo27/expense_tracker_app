@@ -1,33 +1,29 @@
+import 'package:expense_tracker/providers/user_expenses.dart';
 import 'package:expense_tracker/widgets/chart/chart.dart';
 import 'package:expense_tracker/widgets/expenses_list/expenses_list.dart';
 import 'package:expense_tracker/models/expense.dart';
 import 'package:expense_tracker/widgets/new_expense.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-class Expenses extends StatefulWidget {
+class Expenses extends ConsumerStatefulWidget {
   const Expenses({super.key});
 
   @override
-  State<Expenses> createState() {
+  ConsumerState<Expenses> createState() {
     return _ExpensesState();
   }
 }
 
-class _ExpensesState extends State<Expenses> {
-  final List<Expense> _registeredExpenses = [
-    Expense(
-      title: 'Cibo vario supermercato',
-      amount: 19.99,
-      date: DateTime.now(),
-      category: Category.work,
-    ),
-    Expense(
-      title: 'Cinema',
-      amount: 15.69,
-      date: DateTime.now(),
-      category: Category.leisure,
-    ),
-  ];
+class _ExpensesState extends ConsumerState<Expenses> {
+  List<Expense> _registeredExpenses = [];
+  late Future<void> _expensesFuture;
+
+  @override
+  initState() {
+    super.initState();
+    _expensesFuture = ref.read(userExpensesProvider.notifier).loadPlaces();
+  }
 
   _openAddExpenseOverlay() {
     showModalBottomSheet(
@@ -39,9 +35,12 @@ class _ExpensesState extends State<Expenses> {
   }
 
   void _addExpense(Expense expense) {
-    setState(() {
-      _registeredExpenses.add(expense);
-    });
+    ref.read(userExpensesProvider.notifier).addExpense(
+          expense.title,
+          expense.amount,
+          expense.date,
+          expense.category,
+        );
   }
 
   void _removeExpense(Expense expense) {
@@ -53,9 +52,9 @@ class _ExpensesState extends State<Expenses> {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         duration: const Duration(seconds: 3),
-        content: const Text('Expense!'),
+        content: const Text('Acquisto eliminato'),
         action: SnackBarAction(
-            label: 'Undo',
+            label: 'Cancella',
             onPressed: () {
               setState(() {
                 _registeredExpenses.insert(expenseIndex, expense);
@@ -70,8 +69,13 @@ class _ExpensesState extends State<Expenses> {
     final width = MediaQuery.of(context).size.width;
     final height = MediaQuery.of(context).size.height;
 
+    _registeredExpenses = ref.watch(userExpensesProvider);
+    _registeredExpenses.sort((a, b) {
+      return -a.date.compareTo(b.date);
+    });
+
     Widget mainContent = const Center(
-      child: Text('No expenses found. Start adding some!'),
+      child: Text('Nessun acquisto trovato. Inizia ad aggiungerli!'),
     );
 
     if (_registeredExpenses.isNotEmpty) {
@@ -82,34 +86,61 @@ class _ExpensesState extends State<Expenses> {
     }
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Flutter ExpenseTracker'),
-        actions: [
-          IconButton(
-            onPressed: _openAddExpenseOverlay,
-            icon: const Icon(Icons.add),
-          ),
-        ],
-      ),
-      body: width < height
-          ? Column(
-              children: [
-                Chart(expenses: _registeredExpenses),
-                Expanded(
-                  child: mainContent,
-                ),
-              ],
-            )
-          : Row(
-              children: [
-                Expanded(
-                  child: Chart(expenses: _registeredExpenses),
-                ),
-                Expanded(
-                  child: mainContent,
-                ),
-              ],
+        appBar: AppBar(
+          title: const Text('ExpenseTracker'),
+          actions: [
+            IconButton(
+              onPressed: _openAddExpenseOverlay,
+              icon: const Icon(Icons.add),
             ),
-    );
+          ],
+        ),
+        body: FutureBuilder(
+          future: _expensesFuture,
+          builder: (context, snapshot) =>
+              snapshot.connectionState == ConnectionState.waiting
+                  ? const Center(
+                      child: CircularProgressIndicator(),
+                    )
+                  : width < height
+                      ? Column(
+                          children: [
+                            Chart(expenses: _registeredExpenses),
+                            Expanded(
+                              child: mainContent,
+                            ),
+                          ],
+                        )
+                      : Row(
+                          children: [
+                            Expanded(
+                              child: Chart(expenses: _registeredExpenses),
+                            ),
+                            Expanded(
+                              child: mainContent,
+                            ),
+                          ],
+                        ),
+        )
+        // width < height
+        //     ? Column(
+        //         children: [
+        //           Chart(expenses: _registeredExpenses),
+        //           Expanded(
+        //             child: mainContent,
+        //           ),
+        //         ],
+        //       )
+        //     : Row(
+        //         children: [
+        //           Expanded(
+        //             child: Chart(expenses: _registeredExpenses),
+        //           ),
+        //           Expanded(
+        //             child: mainContent,
+        //           ),
+        //         ],
+        //       ),
+        );
   }
 }

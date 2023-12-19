@@ -1,6 +1,7 @@
 import 'package:expense_tracker/widgets/expenses.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 var kColorScheme =
     ColorScheme.fromSeed(seedColor: const Color.fromARGB(255, 73, 176, 39));
@@ -18,7 +19,19 @@ void main() {
   //   ],
   // ).then((fn) {
   runApp(
-    MaterialApp(
+    const ProviderScope(
+      child: MyApp(),
+    ),
+  );
+  // });
+}
+
+class MyApp extends StatelessWidget {
+  const MyApp({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
       darkTheme: ThemeData.dark().copyWith(
         colorScheme: kDarkColorScheme,
         cardTheme: const CardTheme().copyWith(
@@ -57,7 +70,6 @@ void main() {
       ),
       themeMode: ThemeMode.system, //default
       home: const Expenses(),
-    ),
-  );
-  // });
+    );
+  }
 }

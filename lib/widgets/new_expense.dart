@@ -4,23 +4,24 @@ import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 
 import 'package:expense_tracker/models/expense.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-class NewExpense extends StatefulWidget {
+class NewExpense extends ConsumerStatefulWidget {
   const NewExpense({super.key, required this.onAddExpense});
 
   final void Function(Expense expense) onAddExpense;
 
   @override
-  State<NewExpense> createState() {
+  ConsumerState<NewExpense> createState() {
     return _NewExpenseState();
   }
 }
 
-class _NewExpenseState extends State<NewExpense> {
+class _NewExpenseState extends ConsumerState<NewExpense> {
   final _titleController = TextEditingController();
   final _amountController = TextEditingController();
   DateTime? _selectedDate;
-  Category _selectedCategory = Category.leisure;
+  Category _selectedCategory = Category.shopping;
 
   void _presentDatePicker() async {
     final now = DateTime.now();
@@ -43,9 +44,9 @@ class _NewExpenseState extends State<NewExpense> {
       showCupertinoDialog(
         context: context,
         builder: (ctx) => CupertinoAlertDialog(
-          title: const Text('Invalid input'),
+          title: const Text('Dati errati'),
           content: const Text(
-              'Please make sure a valid title, date and amount was entered'),
+              'Per favore, assicurati di aver inserito titolo, costo e data validi'),
           actions: [
             TextButton(
               onPressed: () {
@@ -60,9 +61,9 @@ class _NewExpenseState extends State<NewExpense> {
       showDialog(
         context: context,
         builder: (ctx) => AlertDialog(
-          title: const Text('Invalid input'),
+          title: const Text('Dati errati'),
           content: const Text(
-              'Please make sure a valid title, date and amount was entered'),
+              'Per favore, assicurati di aver inserito titolo, costo e data validi'),
           actions: [
             TextButton(
               onPressed: () {
@@ -77,7 +78,8 @@ class _NewExpenseState extends State<NewExpense> {
   }
 
   void _submitExpenseData() {
-    final enteredAmount = double.tryParse(_amountController.text);
+    final temp = _amountController.text.replaceFirst(',', '.');
+    final enteredAmount = double.tryParse(temp);
     //ritorna null se la stringa non è un numero
     final amountIsInvalid = enteredAmount == null || enteredAmount <= 0;
     if (_titleController.text.trim().isEmpty ||
@@ -135,7 +137,7 @@ class _NewExpenseState extends State<NewExpense> {
                           controller: _titleController,
                           maxLength: 50,
                           decoration: const InputDecoration(
-                            label: Text('Title'),
+                            label: Text('Titolo'),
                           ),
                         ),
                       ),
@@ -148,7 +150,7 @@ class _NewExpenseState extends State<NewExpense> {
                           keyboardType: TextInputType.number,
                           decoration: const InputDecoration(
                             prefixText: '€',
-                            label: Text('Amount'),
+                            label: Text('Costo'),
                           ),
                         ),
                       ),
@@ -159,7 +161,7 @@ class _NewExpenseState extends State<NewExpense> {
                     controller: _titleController,
                     maxLength: 50,
                     decoration: const InputDecoration(
-                      label: Text('Title'),
+                      label: Text('Titolo'),
                     ),
                   ),
                 if (width >= 600)
@@ -196,7 +198,7 @@ class _NewExpenseState extends State<NewExpense> {
                           children: [
                             Text(
                               _selectedDate == null
-                                  ? 'No date selected'
+                                  ? 'Inserisci data'
                                   : formatter.format(_selectedDate!),
                             ),
                             IconButton(
@@ -216,7 +218,7 @@ class _NewExpenseState extends State<NewExpense> {
                           keyboardType: TextInputType.number,
                           decoration: const InputDecoration(
                             prefixText: '€',
-                            label: Text('Amount'),
+                            label: Text('Costo'),
                           ),
                         ),
                       ),
@@ -230,7 +232,7 @@ class _NewExpenseState extends State<NewExpense> {
                           children: [
                             Text(
                               _selectedDate == null
-                                  ? 'No date selected'
+                                  ? 'Inserisci data'
                                   : formatter.format(_selectedDate!),
                             ),
                             IconButton(
@@ -252,12 +254,12 @@ class _NewExpenseState extends State<NewExpense> {
                         onPressed: () {
                           Navigator.pop(context);
                         },
-                        child: const Text('Cancel'),
+                        child: const Text('Cancella'),
                       ),
                       ElevatedButton(
                         onPressed: _submitExpenseData,
                         child: const Text(
-                          'Save Expense',
+                          'Salva',
                         ),
                       ),
                     ],
@@ -291,12 +293,12 @@ class _NewExpenseState extends State<NewExpense> {
                         onPressed: () {
                           Navigator.pop(context);
                         },
-                        child: const Text('Cancel'),
+                        child: const Text('Cancella'),
                       ),
                       ElevatedButton(
                         onPressed: _submitExpenseData,
                         child: const Text(
-                          'Save Expense',
+                          'Salva',
                         ),
                       ),
                     ],
