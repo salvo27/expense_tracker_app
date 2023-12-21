@@ -11,7 +11,7 @@ enum Category { cibo, viaggi, shopping, lavoro }
 const categoryIcons = {
   Category.cibo: Icons.lunch_dining,
   Category.viaggi: Icons.flight_takeoff,
-  Category.shopping: Icons.movie,
+  Category.shopping: Icons.shopping_bag,
   Category.lavoro: Icons.work,
 };
 

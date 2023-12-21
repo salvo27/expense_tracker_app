@@ -45,9 +45,7 @@ class _ExpensesState extends ConsumerState<Expenses> {
 
   void _removeExpense(Expense expense) {
     final expenseIndex = _registeredExpenses.indexOf(expense);
-    setState(() {
-      _registeredExpenses.remove(expense);
-    });
+    ref.read(userExpensesProvider.notifier).removeExpense(expense);
     ScaffoldMessenger.of(context).clearSnackBars();
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
@@ -56,9 +54,7 @@ class _ExpensesState extends ConsumerState<Expenses> {
         action: SnackBarAction(
             label: 'Cancella',
             onPressed: () {
-              setState(() {
-                _registeredExpenses.insert(expenseIndex, expense);
-              });
+              ref.read(userExpensesProvider.notifier).addExpense(expense.title, expense.amount, expense.date, expense.category);
             }),
       ),
     );
@@ -70,9 +66,11 @@ class _ExpensesState extends ConsumerState<Expenses> {
     final height = MediaQuery.of(context).size.height;
 
     _registeredExpenses = ref.watch(userExpensesProvider);
-    _registeredExpenses.sort((a, b) {
-      return -a.date.compareTo(b.date);
-    });
+    if (!_registeredExpenses.isEmpty) {
+      _registeredExpenses.sort((a, b) {
+        return -a.date.compareTo(b.date);
+      });
+    }
 
     Widget mainContent = const Center(
       child: Text('Nessun acquisto trovato. Inizia ad aggiungerli!'),

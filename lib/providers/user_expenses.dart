@@ -49,7 +49,6 @@ class UserExpensesNotifier extends StateNotifier<List<Expense>> {
   }
 
   void addExpense(String title, double amount, DateTime date, Category category) async{
-    final appDir = syspaths.getApplicationDocumentsDirectory();
     final newExpense = Expense(title: title, amount: amount, date: date, category: category);
 
     final db = await _getDatabase();
@@ -61,6 +60,12 @@ class UserExpensesNotifier extends StateNotifier<List<Expense>> {
       'category' : category.name,
     });
     state = [newExpense, ...state];
+  }
+
+  void removeExpense(Expense expense) async{
+    final db = await _getDatabase();
+    db.delete('user_expenses', where: 'id = ?', whereArgs: [expense.id]);
+    state.remove(expense);
   }
 }
 
